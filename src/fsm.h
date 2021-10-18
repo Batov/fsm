@@ -30,7 +30,6 @@ extern "C" {
 #include <stdint.h>
 #include <stdbool.h>
 
-#include "test.h"
 #define FSM_NO_STATE {NULL, NULL, NULL, "FSM_NO_STATE"}
 
 #define MAX_FSMS 1
@@ -56,12 +55,7 @@ typedef struct
 int fsm_create(State_transition *states_table_pointer, Fsm_state_t initial_state, unsigned int max_states);
 int fsm_delete(int handle);
 
-#if TEST
-char *fsm_execute(int handle);
-void fsm_set_current_id(int handle, Fsm_state_t state);
-#else
 bool fsm_execute(int handle);
-#endif
 int fsm_set_event(int handle, int event);
 
 // For only test purpuses
