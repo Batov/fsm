@@ -38,13 +38,13 @@ int fsm_delete(int handle);
 int fsm_set_event(int handle, int event);
 
 /*
-* Returns pointer to state after event execution
+* Returns pointer to Fsm_state_t.state after event execution
 */
 void *fsm_execute(int handle);
 
 
 /*
-* Returns pointer to current state
+* Returns pointer to current Fsm_state_t.state
 */
 void *fsm_get_current_state(int handle);
 
