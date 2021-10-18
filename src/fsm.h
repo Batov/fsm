@@ -8,7 +8,6 @@ extern "C" {
 #include <stdint.h>
 #include <stdbool.h>
 
-#define FSM_NO_STATE {NULL, NULL, NULL, ""}
 #define FSM_INVALID_HANDLE (-1)
 #define FSM_NO_EVENT  0
 
