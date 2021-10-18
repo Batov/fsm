@@ -1,25 +1,3 @@
-/*!
-  @file    fsm.h
-  @author  Zinoviev Sergey
-  @author  Batov Nikita
-  @version 
-  @date    Oct 30, 2017
-  @brief   
-
-  @verbatim
-    
-  @endverbatim
-*/
-/*!
-  @addtogroup _default_group_
-  @{
-*/
-      
-/*!
-  @defgroup 
-  @brief    
-  @{
-*/
 #ifndef FSM_H_
 #define FSM_H_
 
@@ -66,11 +44,3 @@ uint32_t fsm_get_current_id(int handle);
 #endif
 
 #endif /* FSM_H_ */
-
-/*!
-  @}
-*/
-
-/*!
-  @}
-*/
