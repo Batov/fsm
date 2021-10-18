@@ -17,7 +17,7 @@ typedef struct
     void (*on_enter_state)(void);
     void (*state)(void);
     void (*on_exit_state)(void);
-    char end_state[25];
+    char name[25];
 }Fsm_state_t;
 
 typedef struct
@@ -28,14 +28,25 @@ typedef struct
     void (*on_transition)(void);
 }State_transition;
 
+
+/*
+* Returns zero at SUCCESS case
+* Returns non-zero at FAIL case
+*/
 int fsm_create(State_transition *states_table_pointer, Fsm_state_t initial_state, unsigned int max_states);
 int fsm_delete(int handle);
-
-bool fsm_execute(int handle);
 int fsm_set_event(int handle, int event);
 
-// For only test purpuses
-uint32_t fsm_get_current_id(int handle);
+/*
+* Returns pointer to state after event execution
+*/
+Fsm_state_t *fsm_execute(int handle);
+
+
+/*
+* Returns pointer to current state
+*/
+Fsm_state_t *fsm_get_current_state(int handle);
 
 #ifdef __cplusplus
 }
