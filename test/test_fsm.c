@@ -29,8 +29,8 @@ static void state_2(void)
 #define STATE_2 {NULL, state_2, NULL, "STATE_2"}
 
 static const State_transition fsm_states[] = {
-											 {STATE_1, 0, STATE_1, NULL},
-                                        	 {STATE_1, 1, STATE_2, NULL}
+											 {STATE_1, 1, STATE_1, NULL},
+                                        	 {STATE_1, 2, STATE_2, NULL}
                                         	 };     
 
 void test_fsm_base_usage(void)
@@ -39,10 +39,10 @@ void test_fsm_base_usage(void)
 	init_state = *(Fsm_state_t []){STATE_1};
 	int handle = fsm_create((State_transition *) fsm_states, init_state, sizeof(fsm_states)/sizeof(State_transition));
 
-	TEST_ASSERT_EQUAL(0, fsm_set_event(handle, 0));
+	TEST_ASSERT_EQUAL(0, fsm_set_event(handle, 1));
 	fsm_execute(handle);
 
-	TEST_ASSERT_EQUAL(0, fsm_set_event(handle, 1));
+	TEST_ASSERT_EQUAL(0, fsm_set_event(handle, 2));
 	fsm_execute(handle);
 
 	TEST_ASSERT_EQUAL(1, state_1_calls_counter);
