@@ -3,6 +3,7 @@
 #include <assert.h>
 #include <stdbool.h>
 #include <stdio.h>
+#include "fsm_config.h"
 
 /**************************************** Local defines ***********************************************/
 #define HANDLE_IS_VALID    0
