@@ -69,7 +69,7 @@ int fsm_delete(int handle)
     return ret_val;
 }
 
-Fsm_state_t *fsm_execute(int handle)
+void *fsm_execute(int handle)
 {
     Fsm *fsm = &fsm_table[handle];
     State_transition *states_table = (&fsm_table[handle])->states_table_pointer;
@@ -113,7 +113,7 @@ Fsm_state_t *fsm_execute(int handle)
           }
       }
     }
-    return &(fsm->state);
+    return fsm->state.state;
 }
 
 
@@ -131,8 +131,8 @@ int fsm_set_event(int handle, int event)
     return 0;
 }
 
-Fsm_state_t *fsm_get_current_state(int handle)
+void *fsm_get_current_state(int handle)
 {
   Fsm *fsm = &fsm_table[handle];
-  return &(fsm->state);
+  return fsm->state.state;
 }
