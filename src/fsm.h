@@ -22,9 +22,9 @@ typedef struct
 
 typedef struct
 {
-    Fsm_state_t current_state;
+    Fsm_state_t const *current_state;
     int event;
-    Fsm_state_t next_state;
+    Fsm_state_t const *next_state;
     void (*on_transition)(void);
 }State_transition;
 
@@ -33,20 +33,20 @@ typedef struct
 * Returns zero at SUCCESS case
 * Returns non-zero at FAIL case
 */
-int fsm_create(State_transition *states_table_pointer, Fsm_state_t initial_state, unsigned int max_states);
+int fsm_create(State_transition const *states_table_pointer, Fsm_state_t const *initial_state, unsigned int max_states);
 int fsm_delete(int handle);
 int fsm_set_event(int handle, int event);
 
 /*
 * Returns pointer to Fsm_state_t.state after event execution
 */
-void *fsm_execute(int handle);
+Fsm_state_t *fsm_execute(int handle);
 
 
 /*
 * Returns pointer to current Fsm_state_t.state
 */
-void *fsm_get_current_state(int handle);
+Fsm_state_t *fsm_get_current_state(int handle);
 
 #ifdef __cplusplus
 }
