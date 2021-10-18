@@ -73,4 +73,51 @@ void test_fsm_create_delete(void)
 	TEST_ASSERT_EQUAL(0, fsm_delete(handle));
 }
 
+void test_fsm_create_more_use_delete(void)
+{
+	Fsm_state_t init_state = {0};
+	init_state = *(Fsm_state_t []){STATE_1};
+	int handle = fsm_create((State_transition *) fsm_states, init_state, sizeof(fsm_states)/sizeof(State_transition));
+	TEST_ASSERT_NOT_EQUAL(FSM_INVALID_HANDLE, handle);
+
+	TEST_ASSERT_EQUAL(0, fsm_set_event(handle, 1));
+	fsm_execute(handle);
+
+	TEST_ASSERT_EQUAL(0, fsm_set_event(handle, 2));
+	void* dest = fsm_execute(handle);
+	TEST_ASSERT_EQUAL(state_2, dest);
+
+	TEST_ASSERT_EQUAL(0, fsm_set_event(handle, 2));
+	fsm_execute(handle);
+	TEST_ASSERT_EQUAL(0, fsm_set_event(handle, 2));
+	fsm_execute(handle);
+	TEST_ASSERT_EQUAL(0, fsm_set_event(handle, 2));
+	fsm_execute(handle);
+	TEST_ASSERT_EQUAL(0, fsm_set_event(handle, 2));
+	fsm_execute(handle);
+	TEST_ASSERT_EQUAL(0, fsm_set_event(handle, 3));
+	fsm_execute(handle);
+	TEST_ASSERT_EQUAL(0, fsm_set_event(handle, 3));
+	fsm_execute(handle);
+	TEST_ASSERT_EQUAL(0, fsm_set_event(handle, 3));
+	fsm_execute(handle);
+	TEST_ASSERT_EQUAL(0, fsm_set_event(handle, 3));
+	fsm_execute(handle);
+	TEST_ASSERT_EQUAL(0, fsm_set_event(handle, 3));
+	fsm_execute(handle);
+
+	TEST_ASSERT_EQUAL(1, state_1_calls_counter);
+	TEST_ASSERT_EQUAL(6, state_2_calls_counter);
+
+	TEST_ASSERT_EQUAL(0, fsm_set_event(handle, 4));
+	fsm_execute(handle);
+	TEST_ASSERT_EQUAL(0, fsm_set_event(handle, 5));
+	fsm_execute(handle);
+
+	dest = fsm_execute(handle);
+	TEST_ASSERT_EQUAL(state_3, dest);
+
+	TEST_ASSERT_EQUAL(0, fsm_delete(handle));
+}
+
 #endif // TEST
