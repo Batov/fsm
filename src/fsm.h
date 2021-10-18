@@ -40,13 +40,13 @@ int fsm_set_event(int handle, int event);
 /*
 * Returns pointer to Fsm_state_t.state after event execution
 */
-Fsm_state_t *fsm_execute(int handle);
+Fsm_state_t const *fsm_execute(int handle);
 
 
 /*
 * Returns pointer to current Fsm_state_t.state
 */
-Fsm_state_t *fsm_get_current_state(int handle);
+Fsm_state_t const *fsm_get_current_state(int handle);
 
 #ifdef __cplusplus
 }

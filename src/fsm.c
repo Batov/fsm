@@ -11,7 +11,7 @@
 
 typedef struct
 {
-    Fsm_state_t *state;
+    Fsm_state_t const *state;
     unsigned int event;
     unsigned int max_states;
     State_transition *states_table_pointer;
