@@ -18,13 +18,24 @@ typedef struct
 }Fsm;
 
 static Fsm fsm_table[MAX_FSMS];
-
-/*************************************** Local variables **********************************************/
 static int32_t fsm_handle = FSM_INVALID_HANDLE;
-/*************************************** Local functions **********************************************/
-static int validate_handle(int handle);
 
-/***************************************** Code block *************************************************/
+static int validate_handle(int handle)
+{
+    int valid = HANDLE_IS_INVALID;
+
+    if(handle >= 0 && handle < MAX_FSMS)
+    {
+        if(fsm_table[handle].states_table_pointer != NULL)
+        {
+            valid = HANDLE_IS_VALID;
+        }
+    }
+
+    return valid;
+}
+
+
 int fsm_create(State_transition *states_table_pointer, Fsm_state_t initial_state, unsigned int max_states)
 {
     int handle = FSM_INVALID_HANDLE;
@@ -58,53 +69,51 @@ int fsm_delete(int handle)
     return ret_val;
 }
 
-bool fsm_execute(int handle)
+Fsm_state_t *fsm_execute(int handle)
 {
     Fsm *fsm = &fsm_table[handle];
     State_transition *states_table = (&fsm_table[handle])->states_table_pointer;
     State_transition transition;
-    bool event_processed = false;
 
     if(validate_handle(handle) == HANDLE_IS_VALID)
     {
-          for(int i = 0; i < fsm->max_states; i++)
-          {
-              if(fsm->state.state == states_table[i].current_state.state &&
-                 fsm->event == states_table[i].event)
-              {
-                  event_processed = true;
-                  transition = states_table[i];
-                  fsm->event = FSM_NO_EVENT;
+      for(int i = 0; i < fsm->max_states; i++)
+      {
+        if(fsm->state.state == states_table[i].current_state.state &&
+           fsm->event == states_table[i].event)
+        {
+            transition = states_table[i];
+            fsm->event = FSM_NO_EVENT;
 
-                  // Exiting from the current state
-                  if(transition.current_state.on_exit_state != NULL &&
-                     transition.current_state.state != transition.next_state.state)
-                  {
-                      transition.current_state.on_exit_state();
-                  }
-                  
-                  // Call transition callback
-                  if (transition.on_transition != NULL)
-                  {
-                    transition.on_transition();
-                  }
+            // Exiting from the current state
+            if(transition.current_state.on_exit_state != NULL &&
+               transition.current_state.state != transition.next_state.state)
+            {
+                transition.current_state.on_exit_state();
+            }
+            
+            // Call transition callback
+            if (transition.on_transition != NULL)
+            {
+              transition.on_transition();
+            }
 
-                  // Entering to the new state
-                  if(transition.next_state.on_enter_state != NULL &&
-                     transition.current_state.state != transition.next_state.state)
-                  {
-                      transition.next_state.on_enter_state();
-                  }
-                  
-                  assert(transition.next_state.state);
-                  transition.next_state.state();
-                  fsm->state = transition.next_state;
-                  
-                  break;
-                }
+            // Entering to the new state
+            if(transition.next_state.on_enter_state != NULL &&
+               transition.current_state.state != transition.next_state.state)
+            {
+                transition.next_state.on_enter_state();
+            }
+            
+            assert(transition.next_state.state);
+            transition.next_state.state();
+            fsm->state = transition.next_state;
+            
+            break;
           }
+      }
     }
-    return event_processed;
+    return &(fsm->state);
 }
 
 
@@ -122,23 +131,8 @@ int fsm_set_event(int handle, int event)
     return 0;
 }
 
-static int validate_handle(int handle)
-{
-    int valid = HANDLE_IS_INVALID;
-
-    if(handle >= 0 && handle < MAX_FSMS)
-    {
-        if(fsm_table[handle].states_table_pointer != NULL)
-        {
-            valid = HANDLE_IS_VALID;
-        }
-    }
-
-    return valid;
-}
-
-uint32_t fsm_get_current_id(int handle)
+Fsm_state_t *fsm_get_current_state(int handle)
 {
   Fsm *fsm = &fsm_table[handle];
-  return (uint32_t) fsm->state.state;
+  return &(fsm->state);
 }
