@@ -112,6 +112,11 @@ state_t const *fsm_execute(int handle)
     return fsm->current_state;
 }
 
+state_t const *fsm_execute_event(int handle, int event)
+{
+    fsm_set_event(handle, event);
+    return fsm_execute(handle);
+}
 
 int fsm_set_event(int handle, int event)
 {

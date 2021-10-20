@@ -40,6 +40,7 @@ int fsm_set_event(int handle, int event);
 * Returns pointer to state_t after event execution
 */
 state_t const *fsm_execute(int handle);
+state_t const *fsm_execute_event(int handle, int event);
 
 
 /*
