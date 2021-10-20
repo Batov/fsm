@@ -1,6 +1,5 @@
 #include "fsm.h"
 #include <string.h>
-#include <assert.h>
 #include <stdbool.h>
 #include <stdio.h>
 #include "fsm_config.h"
@@ -34,7 +33,6 @@ static int validate_handle(int handle)
 
     return valid;
 }
-
 
 int fsm_create(transition_t const *transition_table, unsigned int transition_table_size, state_t const *initial_state)
 {
@@ -105,7 +103,6 @@ state_t const *fsm_execute(int handle)
                 transition.next->on_enter_state();
             }
             
-            assert(transition.next->on_state);
             transition.next->on_state();
             fsm->current_state = transition.next;
             
