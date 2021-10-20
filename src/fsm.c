@@ -11,13 +11,13 @@
 
 typedef struct
 {
-    Fsm_state_t const *state;
+    state_t const * current_state;
     unsigned int event;
-    unsigned int max_states;
-    State_transition *states_table_pointer;
-}Fsm;
+    unsigned int transition_table_size;
+    transition_t const * transition_table;
+}fsm_t;
 
-static Fsm fsm_table[MAX_FSMS];
+static fsm_t fsm_table[MAX_FSMS];
 static int32_t fsm_handle = FSM_INVALID_HANDLE;
 
 static int validate_handle(int handle)
@@ -26,7 +26,7 @@ static int validate_handle(int handle)
 
     if(handle >= 0 && handle < MAX_FSMS)
     {
-        if(fsm_table[handle].states_table_pointer != NULL)
+        if(fsm_table[handle].transition_table != NULL)
         {
             valid = HANDLE_IS_VALID;
         }
@@ -36,17 +36,17 @@ static int validate_handle(int handle)
 }
 
 
-int fsm_create(State_transition const *states_table_pointer, Fsm_state_t const *initial_state, unsigned int max_states)
+int fsm_create(transition_t const *transition_table, unsigned int transition_table_size, state_t const *initial_state)
 {
     int handle = FSM_INVALID_HANDLE;
 
     for(int i = 0; i < MAX_FSMS; i++)
     {
-        if(fsm_table[i].states_table_pointer == NULL)
+        if(fsm_table[i].transition_table == NULL)
         {
-            fsm_table[i].state = (Fsm_state_t *) initial_state;
-            fsm_table[i].states_table_pointer = (State_transition *) states_table_pointer;
-            fsm_table[i].max_states = max_states;
+            fsm_table[i].current_state = initial_state;
+            fsm_table[i].transition_table = transition_table;
+            fsm_table[i].transition_table_size = transition_table_size;
             fsm_table[i].event = FSM_NO_EVENT;
             handle = i;
             break;
@@ -62,34 +62,34 @@ int fsm_delete(int handle)
 
     if(validate_handle(handle) == HANDLE_IS_VALID)
     {
-        fsm_table[handle].states_table_pointer = NULL;
+        fsm_table[handle].transition_table = NULL;
         ret_val = 0;
     }
 
     return ret_val;
 }
 
-Fsm_state_t *fsm_execute(int handle)
+state_t const *fsm_execute(int handle)
 {
-    Fsm *fsm = &fsm_table[handle];
-    State_transition *states_table = (&fsm_table[handle])->states_table_pointer;
-    State_transition transition;
+    fsm_t *fsm = &fsm_table[handle];
+    transition_t const * transition_table = (&fsm_table[handle])->transition_table;
+    transition_t transition;
 
     if(validate_handle(handle) == HANDLE_IS_VALID)
     {
-      for(int i = 0; i < fsm->max_states; i++)
+      for(int i = 0; i < fsm->transition_table_size; i++)
       {
-        if(fsm->state->state == states_table[i].current_state->state &&
-           fsm->event == states_table[i].event)
+        if(fsm->current_state->on_state == transition_table[i].current->on_state &&
+           fsm->event == transition_table[i].event)
         {
-            transition = states_table[i];
+            transition = transition_table[i];
             fsm->event = FSM_NO_EVENT;
 
             // Exiting from the current state
-            if(transition.current_state->on_exit_state != NULL &&
-               transition.current_state->state != transition.next_state->state)
+            if(transition.current->on_exit_state != NULL &&
+               transition.current->on_state != transition.next->on_state)
             {
-                transition.current_state->on_exit_state();
+                transition.current->on_exit_state();
             }
             
             // Call transition callback
@@ -99,27 +99,27 @@ Fsm_state_t *fsm_execute(int handle)
             }
 
             // Entering to the new state
-            if(transition.next_state->on_enter_state != NULL &&
-               transition.current_state->state != transition.next_state->state)
+            if(transition.next->on_enter_state != NULL &&
+               transition.current->on_state != transition.next->on_state)
             {
-                transition.next_state->on_enter_state();
+                transition.next->on_enter_state();
             }
             
-            assert(transition.next_state->state);
-            transition.next_state->state();
-            fsm->state = transition.next_state;
+            assert(transition.next->on_state);
+            transition.next->on_state();
+            fsm->current_state = transition.next;
             
             break;
           }
       }
     }
-    return fsm->state;
+    return fsm->current_state;
 }
 
 
 int fsm_set_event(int handle, int event)
 {
-    Fsm *fsm = &fsm_table[handle];
+    fsm_t *fsm = &fsm_table[handle];
 
     if(validate_handle(handle) == HANDLE_IS_VALID)
     {
@@ -131,8 +131,8 @@ int fsm_set_event(int handle, int event)
     return 0;
 }
 
-Fsm_state_t *fsm_get_current_state(int handle)
+state_t const *fsm_get_current_state(int handle)
 {
-  Fsm *fsm = &fsm_table[handle];
-  return fsm->state;
+  fsm_t *fsm = &fsm_table[handle];
+  return fsm->current_state;
 }

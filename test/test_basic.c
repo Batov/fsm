@@ -32,11 +32,11 @@ static void on_state_3(void)
 	state_3_calls_counter++;
 }
 
-static const Fsm_state_t state_1 = {NULL, on_state_1, NULL, "STATE_1"};
-static const Fsm_state_t state_2 = {NULL, on_state_2, NULL, "STATE_2"};
-static const Fsm_state_t state_3 = {NULL, on_state_3, NULL, "STATE_3"};
+static const state_t state_1 = {NULL, on_state_1, NULL, "STATE_1"};
+static const state_t state_2 = {NULL, on_state_2, NULL, "STATE_2"};
+static const state_t state_3 = {NULL, on_state_3, NULL, "STATE_3"};
 
-static const State_transition fsm_states[] = {
+static const transition_t fsm_states[] = {
 											 {&state_1, 1, &state_1, NULL},
                                         	 {&state_1, 2, &state_2, NULL},
                                         	 {&state_2, 3, &state_2, NULL},
@@ -46,14 +46,14 @@ static const State_transition fsm_states[] = {
 
 void test_fsm_create_use_delete(void)
 {
-	int handle = fsm_create(fsm_states, &state_1, sizeof(fsm_states)/sizeof(State_transition));
+	int handle = fsm_create(fsm_states, sizeof(fsm_states)/sizeof(transition_t), &state_1);
 	TEST_ASSERT_NOT_EQUAL(FSM_INVALID_HANDLE, handle);
 
 	TEST_ASSERT_EQUAL(0, fsm_set_event(handle, 1));
 	fsm_execute(handle);
 
 	TEST_ASSERT_EQUAL(0, fsm_set_event(handle, 2));
-	Fsm_state_t* dest = fsm_execute(handle);
+	state_t const * dest = fsm_execute(handle);
 	TEST_ASSERT_EQUAL(&state_2, dest);
 
 	TEST_ASSERT_EQUAL(1, state_1_calls_counter);
@@ -64,21 +64,21 @@ void test_fsm_create_use_delete(void)
 
 void test_fsm_create_delete(void)
 {
-	int handle = fsm_create(fsm_states, &state_1, sizeof(fsm_states)/sizeof(State_transition));
+	int handle = fsm_create(fsm_states, sizeof(fsm_states)/sizeof(transition_t), &state_1);
 	TEST_ASSERT_NOT_EQUAL(FSM_INVALID_HANDLE, handle);
 	TEST_ASSERT_EQUAL(0, fsm_delete(handle));
 }
 
 void test_fsm_create_more_use_delete(void)
 {
-	int handle = fsm_create(fsm_states, &state_1, sizeof(fsm_states)/sizeof(State_transition));
+	int handle = fsm_create(fsm_states, sizeof(fsm_states)/sizeof(transition_t), &state_1);
 	TEST_ASSERT_NOT_EQUAL(FSM_INVALID_HANDLE, handle);
 
 	TEST_ASSERT_EQUAL(0, fsm_set_event(handle, 1));
 	fsm_execute(handle);
 
 	TEST_ASSERT_EQUAL(0, fsm_set_event(handle, 2));
-	Fsm_state_t* dest = fsm_execute(handle);
+	state_t const * dest = fsm_execute(handle);
 	TEST_ASSERT_EQUAL(&state_2, dest);
 
 	TEST_ASSERT_EQUAL(0, fsm_set_event(handle, 2));

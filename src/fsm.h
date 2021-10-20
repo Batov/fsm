@@ -14,38 +14,38 @@ extern "C" {
 typedef struct
 {
     void (*on_enter_state)(void);
-    void (*state)(void);
+    void (*on_state)(void);
     void (*on_exit_state)(void);
     char name[25];
-}Fsm_state_t;
+}state_t;
 
 typedef struct
 {
-    Fsm_state_t const *current_state;
+    state_t const *current;
     int event;
-    Fsm_state_t const *next_state;
+    state_t const *next;
     void (*on_transition)(void);
-}State_transition;
+}transition_t;
 
 
 /*
 * Returns zero at SUCCESS case
 * Returns non-zero at FAIL case
 */
-int fsm_create(State_transition const *states_table_pointer, Fsm_state_t const *initial_state, unsigned int max_states);
+int fsm_create(transition_t const *transition_table, unsigned int transition_table_size, state_t const *initial_state);
 int fsm_delete(int handle);
 int fsm_set_event(int handle, int event);
 
 /*
-* Returns pointer to Fsm_state_t.state after event execution
+* Returns pointer to state_t after event execution
 */
-Fsm_state_t const *fsm_execute(int handle);
+state_t const *fsm_execute(int handle);
 
 
 /*
-* Returns pointer to current Fsm_state_t.state
+* Returns pointer to current state_t
 */
-Fsm_state_t const *fsm_get_current_state(int handle);
+state_t const *fsm_get_current_state(int handle);
 
 #ifdef __cplusplus
 }
