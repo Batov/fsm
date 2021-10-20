@@ -77,7 +77,7 @@ state_t const *fsm_execute(int handle)
     {
       for(int i = 0; i < fsm->transition_table_size; i++)
       {
-        if(fsm->current_state->on_state == transition_table[i].current->on_state &&
+        if(fsm->current_state == transition_table[i].current &&
            fsm->event == transition_table[i].event)
         {
             transition = transition_table[i];
@@ -85,7 +85,7 @@ state_t const *fsm_execute(int handle)
 
             // Exiting from the current state
             if(transition.current->on_exit_state != NULL &&
-               transition.current->on_state != transition.next->on_state)
+               transition.current != transition.next)
             {
                 transition.current->on_exit_state();
             }
@@ -98,7 +98,7 @@ state_t const *fsm_execute(int handle)
 
             // Entering to the new state
             if(transition.next->on_enter_state != NULL &&
-               transition.current->on_state != transition.next->on_state)
+               transition.current != transition.next)
             {
                 transition.next->on_enter_state();
             }
