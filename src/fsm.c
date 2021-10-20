@@ -74,40 +74,40 @@ state_t const *fsm_execute(int handle)
 
     if(validate_handle(handle) == HANDLE_IS_VALID)
     {
-      for(int i = 0; i < fsm->transition_table_size; i++)
-      {
-        if(fsm->current_state == transition_table[i].current &&
-           fsm->event == transition_table[i].event)
+        for(int i = 0; i < fsm->transition_table_size; i++)
         {
-            transition = transition_table[i];
-            fsm->event = FSM_NO_EVENT;
+            if(fsm->current_state == transition_table[i].current &&
+                fsm->event == transition_table[i].event)
+            {
+                transition = transition_table[i];
+                fsm->event = FSM_NO_EVENT;
 
-            // Exiting from the current state
-            if(transition.current->on_exit_state != NULL &&
-               transition.current != transition.next)
-            {
-                transition.current->on_exit_state();
-            }
-            
-            // Call transition callback
-            if (transition.on_transition != NULL)
-            {
-              transition.on_transition();
-            }
+                // Exiting from the current state
+                if(transition.current->on_exit_state != NULL &&
+                    transition.current != transition.next)
+                {
+                    transition.current->on_exit_state();
+                }
+                
+                // Call transition callback
+                if (transition.on_transition != NULL)
+                {
+                    transition.on_transition();
+                }
 
-            // Entering to the new state
-            if(transition.next->on_enter_state != NULL &&
-               transition.current != transition.next)
-            {
-                transition.next->on_enter_state();
+                // Entering to the new state
+                if(transition.next->on_enter_state != NULL &&
+                    transition.current != transition.next)
+                {
+                    transition.next->on_enter_state();
+                }
+                
+                transition.next->on_state();
+                fsm->current_state = transition.next;
+                
+                break;
             }
-            
-            transition.next->on_state();
-            fsm->current_state = transition.next;
-            
-            break;
-          }
-      }
+        }
     }
     return fsm->current_state;
 }
@@ -122,13 +122,15 @@ int fsm_set_event(int handle, int event)
         fsm->event = event;
     }
     else
+    {
         return -1;
+    } 
 
     return 0;
 }
 
 state_t const *fsm_get_current_state(int handle)
 {
-  fsm_t *fsm = &fsm_table[handle];
-  return fsm->current_state;
+    fsm_t *fsm = &fsm_table[handle];
+    return fsm->current_state;
 }
