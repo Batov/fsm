@@ -8,5 +8,10 @@ jobs:
     steps:
       - name: Checkout repo
         uses: actions/checkout@v2
-      - name: Build and show result
+      - name: Run tests
         uses: batov/ceedling_action@master
+      - name: Publish Unit Test Results
+        uses: EnricoMi/publish-unit-test-result-action@v1
+        if: always()
+        with:
+            files: build/artifacts/test/report.xml
